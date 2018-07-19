@@ -1,0 +1,9 @@
+site_info.get:
+  path: 'page_json/{key}/{nid}'
+  defaults: 
+    _controller: '\Drupal\site_info\Controller\TestController::retrieve'
+  methods:  [GET]
+  options: 
+    _auth: [ 'basic_auth' ]
+  requirements:
+    _custom_access: '\Drupal\site_info\Controller\TestController::access'

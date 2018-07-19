@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Contains site_info.module.
+ */
+
+use Drupal\node\Entity\Node;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_alter(). Adds a new field for entering the API key to the Basic Site Settings page.
+ * Retrieves API key system variable from config. If no value is set, displays default value 'No API Key yet'.
+ * On form submit, direct to site_info_form_submit function to save the new API key value in config.
+ */
+function site_info_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  if ($form_id == 'system_site_information_settings') {
+    $config = \Drupal::service('config.factory')->getEditable('site_info.settings');
+    $field_api_content = $config->get('apisitekey');
+    $field_api_content = (!$field_api_content ? 'No API Key yet' : $field_api_content);
+    $form['field_site_api_key'] = array (
+                '#title' => t('Site API Key'),
+                '#type' => 'textfield',
+                '#default_value' => $field_api_content,
+                '#description' => 'Please enter it',
+                );
+
+    $form['actions']['submit']['#submit'][] = 'site_info_form_submit';
+  }
+}
+
+
+/**
+ * Set the config for the siteapikey system variable from the value passed through $form_state.
+ * Display the API key entered through the form to the user after submit.
+ */
+function site_info_form_submit($form, $form_state) {
+  $config = \Drupal::service('config.factory')->getEditable('site_info.settings');
+  $config->set('apisitekey', $form_state->getValue('field_site_api_key'))->save();
+  drupal_set_message('The Site API Key has been saved with the value: ' . $config->get('apisitekey'));
+}
